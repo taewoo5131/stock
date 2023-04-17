@@ -27,7 +27,7 @@ public class StockTest {
     @BeforeEach
     public void 생성() {
         // given
-        Stock stock = new Stock(1L , 10L);
+        Stock stock = new Stock(1L , 100L);
         stockRepository.saveAndFlush(stock);
     }
 
@@ -37,7 +37,6 @@ public class StockTest {
     }
 
     @Test
-    @Transactional
     public void 감소테스트() {
         // given
         Stock stock = stockRepository.findById(1L).orElse(null);
@@ -50,12 +49,11 @@ public class StockTest {
     }
 
     @Test
-    @Transactional
     public void 동시에_100개의_감소요청() throws InterruptedException{
         int thread = 100;
         ExecutorService executorService = Executors.newFixedThreadPool(thread);
         CountDownLatch latch = new CountDownLatch(thread);
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < thread; i++) {
             executorService.submit(() -> {
                 try{
                     stockService.decrease(1L , 1L);
@@ -68,6 +66,7 @@ public class StockTest {
 
         Stock stock = stockRepository.findById(1L).orElse(null);
 
+        System.out.println(stock.getQuantity());
         Assertions.assertThat(stock.getQuantity()).isEqualTo(0L);
     }
 }

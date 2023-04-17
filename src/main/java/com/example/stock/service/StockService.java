@@ -14,9 +14,14 @@ public class StockService {
     @Autowired
     private StockRepository stockRepository;
 
-    @Transactional
-    public void decrease(Long id, Long quantity) {
-        Stock stock = stockRepository.findById(id).orElse(null);
-        stock.decrease(quantity);
+//    @Transactional
+    public synchronized void decrease(Long id, Long quantity) {
+        try {
+            Stock stock = stockRepository.findById(id).orElse(null);
+            stock.decrease(quantity);
+            stockRepository.saveAndFlush(stock);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
